@@ -67,7 +67,7 @@ class ENS160:
 
     self.sensor.set_temp_and_hum(ambient_temp=temperature, relative_humidity=humidity)
 
-    return self.sensor.get_AQI, self.sensor.get_TVOC_ppb, self.sensor.get_ECO2_ppm
+    return self.sensor.get_AQI, self.sensor.get_TVOC_ppb, self.sensor.get_ECO2_ppm, self.sensor.get_ENS160_status()
 
   def loop(self):
     '''

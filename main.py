@@ -29,9 +29,10 @@ while True:
     temp, pressure, humidity = get_bme_data()
     if ens is not None:
         try:
-            aqi, vocs, co2 = ens.get_all_data(temperature=temp, humidity=humidity)
+            aqi, vocs, co2, status = ens.get_all_data(temperature=temp, humidity=humidity)
         except:
-            aqi, vocs, co2 = None, None, None
+            aqi, vocs, co2, status = None, None, None, None
+        print('Status: {}'.format(status))
         print('Air index: {}/5'.format(int(aqi)))
         print('VOCS: {}ppb'.format(int(vocs)))
         print('CO2: {}ppm'.format(int(co2)))
