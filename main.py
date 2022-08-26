@@ -1,6 +1,7 @@
 from bme280.bme280 import readBME280All as read_bme
 from DFRobot_ENS160.python.raspberrypi.examples.get_data import ENS160
 from time import sleep
+from logger import Logger
 
 
 def get_bme_data():
@@ -24,14 +25,16 @@ except Exception as ex:
     print('cannot initialize ENS160 sensor. Exception: ' + str(ex))
     ens = None
 
+logger = Logger()
 
 while True:
     temp, pressure, humidity = get_bme_data()
+    aqi, vocs, co2, status = None, None, None, None
     if ens is not None:
         try:
             aqi, vocs, co2, status = ens.get_all_data(temperature=temp, humidity=humidity)
         except:
-            aqi, vocs, co2, status = None, None, None, None
+            pass
         print('Status: {}'.format(status))
         print('Air index: {}/5'.format(int(aqi)))
         print('VOCS: {}ppb'.format(int(vocs)))
@@ -39,4 +42,6 @@ while True:
     print('Temperature: {:.1f}*C'.format(temp))
     print('Humidity: {:.1f}%'.format(humidity))
     print('Pressure: {:.2f}hPa\n'.format(pressure))
-    sleep(1)
+    logger.append_record({'temp': temp, 'pressure': pressure, 'humidity': humidity,
+                          'aqi': aqi, 'vocs': vocs, 'co2': co2})
+    sleep(10)
