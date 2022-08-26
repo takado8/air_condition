@@ -38,5 +38,5 @@ while True:
         print('CO2: {}ppm'.format(int(co2)))
     print('Temperature: {:.1f}*C'.format(temp))
     print('Humidity: {:.1f}%'.format(humidity))
-    print('Pressure: {:.2f}hPa'.format(pressure))
+    print('Pressure: {:.2f}hPa\n'.format(pressure))
     sleep(1)
