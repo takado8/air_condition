@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import matplotlib.dates as mdates
 import matplotlib.animation as anim
 from logger import Logger
+import sys
 
 plt.style.use('dark_background')
 
@@ -114,4 +115,9 @@ def load_log(last_n_hours=None):
 
 
 if __name__ == '__main__':
-    plot(load_log())
+    args = sys.argv
+    h = None
+    if len(args) > 1:
+        if '-h' in args:
+            h = int(args[args.index('-h') + 1])
+    plot(load_log(h))
