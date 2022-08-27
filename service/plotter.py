@@ -8,7 +8,7 @@ import sys
 plt.style.use('dark_background')
 
 
-def plot(args):
+def plot(args, last_n_hours):
     # create figure and axis objects with subplots()
     # {x, y1, y2, y1_label, y2_label, x_label='Time'}
 
@@ -19,7 +19,7 @@ def plot(args):
     # plt.gca().xaxis.set_minor_locator(plt.MultipleLocator(15))
     def update(i):
         args.clear()
-        args.extend(load_log())
+        args.extend(load_log(last_n_hours))
         i = 0
         for entry in args:
             ax[i].clear()
@@ -38,7 +38,8 @@ def plot(args):
             ax2.set_ylabel(entry['y2_label'], color="blue", fontsize=14)
             myFmt = mdates.DateFormatter('%d.%m %H:%M')
             ax[i].xaxis.set_major_formatter(myFmt)
-            ax[i].xaxis.set_major_locator(mdates.HourLocator(interval=1))
+            # ax[i].xaxis.set_major_locator(mdates.HourLocator(interval=1))
+            ax[i].xaxis.set_major_locator(mdates.MinuteLocator(interval=1))
             # plt.rc('grid', linestyle='-', color='grey', linewidth=0.1)
             # plt.grid(color='grey', linestyle=':', linewidth=0.5, axis='both')
             ax[i].grid(b=True, which='major', axis="both", color='grey', linestyle=':', linewidth=0.5)
@@ -59,14 +60,13 @@ def get_twin(ax):
             return other_ax
 
 
-def load_log(last_n_hours=None):
+def load_log(last_n_hours):
     log = logger.load_log()
     dates = []
     temp = []
     humidity = []
     vocs = []
     co2 = []
-    import random
     avg_temp = []
     avg_humidity = []
     avg_vocs = []
@@ -92,16 +92,21 @@ def load_log(last_n_hours=None):
         i += 1
     if last_n_hours:
         last_date = dates[-1]
+
         for i in range(len(dates)-1, 0, -1):
-            total_sec_diff =(last_date - dates[i]).total_seconds()
+            total_sec_diff = (last_date - dates[i]).total_seconds()
             hours_diff = divmod(total_sec_diff, 3600)[0]
-            if hours_diff == last_n_hours:
+            print('hd: ' + str(hours_diff))
+            if hours_diff >= last_n_hours:
+                print("hours diff on i=" + str(i))
                 break
-        dates = dates[-i:]
-        vocs = vocs[-i:]
-        co2 = co2[-i:]
-        temp = temp[-i:]
-        humidity = humidity[-i:]
+
+        dates = dates[i:]
+        vocs = vocs[i:]
+        co2 = co2[i:]
+        temp = temp[i:]
+        humidity = humidity[i:]
+        print('len dates: ' +str(len(dates)))
     # print(log[-20:])
     # print(dates[-20:])
     # print(temp[-20:])
@@ -116,8 +121,10 @@ def load_log(last_n_hours=None):
 
 if __name__ == '__main__':
     args = sys.argv
+
     h = None
     if len(args) > 1:
         if '-h' in args:
             h = int(args[args.index('-h') + 1])
-    plot(load_log(h))
+
+    plot(load_log(h), h)
