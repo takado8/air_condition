@@ -39,7 +39,7 @@ def plot(args, last_n_hours):
             myFmt = mdates.DateFormatter('%d.%m %H:%M')
             ax[i].xaxis.set_major_formatter(myFmt)
             # ax[i].xaxis.set_major_locator(mdates.HourLocator(interval=1))
-            ax[i].xaxis.set_major_locator(mdates.MinuteLocator(interval=1))
+            ax[i].xaxis.set_major_locator(mdates.MinuteLocator(interval=5))
             # plt.rc('grid', linestyle='-', color='grey', linewidth=0.1)
             # plt.grid(color='grey', linestyle=':', linewidth=0.5, axis='both')
             ax[i].grid(b=True, which='major', axis="both", color='grey', linestyle=':', linewidth=0.5)
