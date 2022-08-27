@@ -57,7 +57,8 @@ def get_twin(ax):
         if other_ax.bbox.bounds == ax.bbox.bounds:
             return other_ax
 
-def load_log():
+
+def load_log(last_n_hours=None):
     log = logger.load_log()
     dates = []
     temp = []
@@ -88,7 +89,18 @@ def load_log():
             avg_vocs = []
             avg_co2 = []
         i += 1
-
+    if last_n_hours:
+        last_date = dates[-1]
+        for i in range(len(dates)-1, 0, -1):
+            total_sec_diff =(last_date - dates[i]).total_seconds()
+            hours_diff = divmod(total_sec_diff, 3600)[0]
+            if hours_diff == last_n_hours:
+                break
+        dates = dates[-i:]
+        vocs = vocs[-i:]
+        co2 = co2[-i:]
+        temp = temp[-i:]
+        humidity = humidity[-i:]
     # print(log[-20:])
     # print(dates[-20:])
     # print(temp[-20:])
