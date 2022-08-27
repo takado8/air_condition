@@ -96,9 +96,7 @@ def load_log(last_n_hours):
         for i in range(len(dates)-1, 0, -1):
             total_sec_diff = (last_date - dates[i]).total_seconds()
             hours_diff = divmod(total_sec_diff, 3600)[0]
-            print('hd: ' + str(hours_diff))
             if hours_diff >= last_n_hours:
-                print("hours diff on i=" + str(i))
                 break
 
         dates = dates[i:]
@@ -106,7 +104,6 @@ def load_log(last_n_hours):
         co2 = co2[i:]
         temp = temp[i:]
         humidity = humidity[i:]
-        print('len dates: ' +str(len(dates)))
     # print(log[-20:])
     # print(dates[-20:])
     # print(temp[-20:])
