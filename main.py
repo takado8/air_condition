@@ -1,7 +1,7 @@
 from bme280.bme280 import readBME280All as read_bme
 from DFRobot_ENS160.python.raspberrypi.examples.get_data import ENS160
 from time import sleep
-from logger import Logger
+from service.logger import Logger
 
 
 def get_bme_data():

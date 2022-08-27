@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 
-LOG_FILE_PATH = 'log/log.json'
+LOG_FILE_PATH = '../log/log.json'
 
 
 class Logger:
@@ -22,7 +22,7 @@ class Logger:
     def load_log(self):
         with open(LOG_FILE_PATH) as f:
             my_list = [json.loads(line) for line in f]
-        print(my_list)
+        return my_list
 
     def get_datetime(self):
         now = datetime.now()
@@ -31,7 +31,4 @@ class Logger:
 
 if __name__ == '__main__':
     logger = Logger()
-    logger.append_record({'date': '1.1.1', 'co2': 1366, 'voc': 89})
-    logger.append_record({'date': '12.12.22', 'co2': 400, 'voc': 44})
-    logger.append_record({'date': '14.12.22', 'co2': 444, 'voc': 55})
     logger.load_log()
