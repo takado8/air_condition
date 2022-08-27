@@ -77,7 +77,7 @@ def load_log(last_n_hours):
         avg_humidity.append(round(entry['humidity'], 1))
         avg_vocs.append(round(entry['vocs'], 0))
         avg_co2.append(round(entry['co2'], 0))
-        if i == 2:
+        if i == 1:
             i = 0
             date_time_obj = datetime.strptime(entry['date'], "%d.%m.%Y %H:%M:%S")
             dates.append((date_time_obj - timedelta(hours=6)))

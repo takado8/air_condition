@@ -44,4 +44,4 @@ while True:
     print('Pressure: {:.2f}hPa\n'.format(pressure))
     logger.append_record({'temp': temp, 'pressure': pressure, 'humidity': humidity,
                           'aqi': aqi, 'vocs': vocs, 'co2': co2})
-    sleep(10)
+    sleep(5)
