@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import matplotlib.dates as mdates
 import matplotlib.animation as anim
-from service.logger import Logger
+from logger import Logger
 
 plt.style.use('dark_background')
 
@@ -12,53 +12,50 @@ def plot(args):
     # {x, y1, y2, y1_label, y2_label, x_label='Time'}
 
     fig, ax = plt.subplots(len(args))
-    i = 0
-    for entry in args:
-        # make a plot
-        ax[i].plot(entry['x'], entry['y1'], color="red")
-        # set x-axis label
-        ax[i].set_xlabel(entry['x_label'], fontsize=14)
-        # set y-axis label
-        ax[i].set_ylabel(entry['y1_label'], color="red", fontsize=14)
 
-        # twin object for two different y-axis on the sample plot
-        ax2 = ax[i].twinx()
-        # make a plot with different y-axis using second axis object
-        ax2.plot(entry['x'], entry['y2'], color="blue")
-        ax2.set_ylabel(entry['y2_label'], color="blue", fontsize=14)
-        myFmt = mdates.DateFormatter('%d.%m %H:%M')
-        ax[i].xaxis.set_major_formatter(myFmt)
-        ax[i].xaxis.set_major_locator(mdates.HourLocator(interval=1))
-        # plt.rc('grid', linestyle='-', color='grey', linewidth=0.1)
-        # plt.grid(color='grey', linestyle=':', linewidth=0.5, axis='both')
-        ax[i].grid(b=True, which='major', axis="both", color='grey', linestyle=':', linewidth=0.5)
-        i += 1
 
     # plt.gca().xaxis.set_major_locator(plt.MultipleLocator(60))
     # plt.gca().xaxis.set_minor_locator(plt.MultipleLocator(15))
     def update(i):
         args.clear()
-        args.extend(set_new_args())
+        args.extend(load_log())
+        i = 0
+        for entry in args:
+            ax[i].clear()
+            # make a plot
+            ax[i].plot(entry['x'], entry['y1'], color="red")
+            # set x-axis label
+            ax[i].set_xlabel(entry['x_label'], fontsize=14)
+            # set y-axis label
+            ax[i].set_ylabel(entry['y1_label'], color="red", fontsize=14)
 
-        ax[0].clear()
-        ax[0].plot(args[0]['x'], args[0]['y1'], color="red")
-
-        ax[1].clear()
-        ax[1].plot(args[1]['x'], args[1]['y1'], color="red")
+            # twin object for two different y-axis on the sample plot
+            twin = get_twin(ax[i])
+            ax2 = ax[i].twinx() if twin is None else twin
+            # make a plot with different y-axis using second axis object
+            ax2.plot(entry['x'], entry['y2'], color="blue")
+            ax2.set_ylabel(entry['y2_label'], color="blue", fontsize=14)
+            myFmt = mdates.DateFormatter('%d.%m %H:%M')
+            ax[i].xaxis.set_major_formatter(myFmt)
+            ax[i].xaxis.set_major_locator(mdates.HourLocator(interval=1))
+            # plt.rc('grid', linestyle='-', color='grey', linewidth=0.1)
+            # plt.grid(color='grey', linestyle=':', linewidth=0.5, axis='both')
+            ax[i].grid(b=True, which='major', axis="both", color='grey', linestyle=':', linewidth=0.5)
+            i += 1
         plt.gcf().autofmt_xdate()
 
-    plt.gcf().autofmt_xdate()
-
-    a = anim.FuncAnimation(fig, update, frames=10000, repeat=False)
+    a = anim.FuncAnimation(fig, update, repeat=False, interval=1000)
     plt.show()
-
-
-def set_new_args():
-    return load_log()
 
 
 logger = Logger()
 
+def get_twin(ax):
+    for other_ax in ax.figure.axes:
+        if other_ax is ax:
+            continue
+        if other_ax.bbox.bounds == ax.bbox.bounds:
+            return other_ax
 
 def load_log():
     log = logger.load_log()
