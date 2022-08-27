@@ -2,7 +2,9 @@ import json
 import os
 from datetime import datetime
 
-LOG_FILE_PATH = '../log/log.json'
+import os
+WORKING_DIR_PATH = os.getcwd()
+LOG_FILE_PATH = os.path.join(WORKING_DIR_PATH, 'log', 'log.json')
 
 
 class Logger:
