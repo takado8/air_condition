@@ -8,14 +8,17 @@ import sys
 import math
 
 SCALE_Y_TICKS_NB = 7
+AVERAGE_COUNT = 12
 plt.style.use('dark_background')
 
 
 def plot(args, last_n_hours):
     # create figure and axis objects with subplots()
     # {x, y1, y2, y1_label, y2_label, x_label='Time'}
-
-    fig, ax = plt.subplots(len(args))
+    fig, ax = plt.subplots(len(args), facecolor=(0.05, 0.1, 0.2))
+    plt.subplots_adjust(left=0.075, right=0.93, top=0.93, bottom=0.15, hspace=0.35)
+    ax[0].set_facecolor((0.1, 0.2, 0.4))
+    ax[1].set_facecolor((0.1, 0.2, 0.4))
 
     def update(i):
         def calc_step(min_y, max_y):
@@ -40,24 +43,27 @@ def plot(args, last_n_hours):
             # print('step y1: {} step y2: {}'.format(step1, step2))
             ax[i].clear()
             # make a plot
-            ax[i].plot(entry['x'], entry['y1'], color="red")
+            ax[i].plot(entry['x'], entry['y1'], color='red')
+
             # set x-axis label
             ax[i].set_xlabel(entry['x_label'], fontsize=14)
             # set y-axis label
-            ax[i].set_ylabel(entry['y1_label'], color="red", fontsize=14)
+            ax[i].set_ylabel(entry['y1_label'], color='red', fontsize=14)
             if i == 0:
                 txt = 'VOCs: {} ppb    CO2: {} ppm'
             else:
                 txt = 'Temp: {} *C    Humidity: {} %'
-            ax[i].title.set_text(txt.format(entry['y1'][-1], entry['y2'][-1]))
+            ax[i].set_title(txt.format(entry['y1'][-1], entry['y2'][-1]), fontsize=20)
+            # ax[i].title.setsize(20)
+
 
             # twin object for two different y-axis on the sample plot
             twin = get_twin(ax[i])
             ax2 = ax[i].twinx() if twin is None else twin
             ax2.clear()
             # make a plot with different y-axis using second axis object
-            ax2.plot(entry['x'], entry['y2'], color="blue")
-            ax2.set_ylabel(entry['y2_label'], color="blue", fontsize=14)
+            ax2.plot(entry['x'], entry['y2'], color=(0.2, 0.85, 0.95))
+            ax2.set_ylabel(entry['y2_label'], color=(0.2, 0.85, 0.95), fontsize=14)
             myFmt = mdates.DateFormatter('%d.%m %H:%M')
             ax[i].xaxis.set_major_formatter(myFmt)
             # ax[i].xaxis.set_minor_locator(mdates.MinuteLocator(interval=15))
@@ -112,7 +118,7 @@ def load_log(last_n_hours):
         avg_humidity.append(round(entry['humidity'], 1))
         avg_vocs.append(round(entry['vocs'], 0))
         avg_co2.append(round(entry['co2'], 0))
-        if i == 10:
+        if i == AVERAGE_COUNT:
             i = 0
             date_time_obj = datetime.strptime(entry['date'], "%d.%m.%Y %H:%M:%S")
             dates.append((date_time_obj - timedelta(hours=6)))

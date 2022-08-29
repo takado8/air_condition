@@ -4,6 +4,9 @@ from time import sleep
 from service.logger import Logger
 
 
+INTERVAL = 5
+
+
 def get_bme_data():
     try:
         return read_bme()
