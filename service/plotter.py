@@ -2,9 +2,12 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import matplotlib.dates as mdates
 import matplotlib.animation as anim
+import matplotlib.ticker as ticker
 from logger import Logger
 import sys
+import math
 
+SCALE_Y_TICKS_NB = 7
 plt.style.use('dark_background')
 
 
@@ -14,14 +17,27 @@ def plot(args, last_n_hours):
 
     fig, ax = plt.subplots(len(args))
 
-
-    # plt.gca().xaxis.set_major_locator(plt.MultipleLocator(60))
-    # plt.gca().xaxis.set_minor_locator(plt.MultipleLocator(15))
     def update(i):
+        def calc_step(min_y, max_y):
+            def orderOfMagnitude(number):
+                return int(math.floor(math.log(number, 10)))
+            delta_y = max_y - min_y
+            step = delta_y / SCALE_Y_TICKS_NB
+            order = orderOfMagnitude(step)
+            return round(step, -order)
+
         args.clear()
         args.extend(load_log(last_n_hours))
         i = 0
         for entry in args:
+            max_y1 = max(entry['y1'])
+            min_y1 = min(entry['y1'])
+            max_y2 = max(entry['y2'])
+            min_y2 = min(entry['y2'])
+            step1 = calc_step(min_y1, max_y1)
+            step2 = calc_step(min_y2, max_y2)
+
+            # print('step y1: {} step y2: {}'.format(step1, step2))
             ax[i].clear()
             # make a plot
             ax[i].plot(entry['x'], entry['y1'], color="red")
@@ -29,19 +45,37 @@ def plot(args, last_n_hours):
             ax[i].set_xlabel(entry['x_label'], fontsize=14)
             # set y-axis label
             ax[i].set_ylabel(entry['y1_label'], color="red", fontsize=14)
+            if i == 0:
+                txt = 'VOCs: {} ppb    CO2: {} ppm'
+            else:
+                txt = 'Temp: {} *C    Humidity: {} %'
+            ax[i].title.set_text(txt.format(entry['y1'][-1], entry['y2'][-1]))
 
             # twin object for two different y-axis on the sample plot
             twin = get_twin(ax[i])
             ax2 = ax[i].twinx() if twin is None else twin
+            ax2.clear()
             # make a plot with different y-axis using second axis object
             ax2.plot(entry['x'], entry['y2'], color="blue")
             ax2.set_ylabel(entry['y2_label'], color="blue", fontsize=14)
             myFmt = mdates.DateFormatter('%d.%m %H:%M')
             ax[i].xaxis.set_major_formatter(myFmt)
-            # ax[i].xaxis.set_major_locator(mdates.HourLocator(interval=1))
-            ax[i].xaxis.set_major_locator(mdates.MinuteLocator(interval=5))
-            # plt.rc('grid', linestyle='-', color='grey', linewidth=0.1)
-            # plt.grid(color='grey', linestyle=':', linewidth=0.5, axis='both')
+            # ax[i].xaxis.set_minor_locator(mdates.MinuteLocator(interval=15))
+            if last_n_hours >= 24:
+                ax[i].xaxis.set_major_locator(mdates.HourLocator(interval=2))
+            else:
+                if last_n_hours >= 12:
+                    byminute = [0, 60]
+                elif last_n_hours >= 6:
+                    byminute = [0, 30]
+                elif last_n_hours >= 3:
+                    byminute = [0, 15, 30, 45, 60]
+                else:
+                    byminute = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]
+                ax[i].xaxis.set_major_locator(mdates.MinuteLocator(byminute=byminute, interval=1))
+
+            ax2.yaxis.set_major_locator(ticker.MultipleLocator(step2))
+            ax[i].yaxis.set_major_locator(ticker.MultipleLocator(step1))
             ax[i].grid(b=True, which='major', axis="both", color='grey', linestyle=':', linewidth=0.5)
             i += 1
         plt.gcf().autofmt_xdate()
@@ -51,6 +85,7 @@ def plot(args, last_n_hours):
 
 
 logger = Logger()
+
 
 def get_twin(ax):
     for other_ax in ax.figure.axes:
@@ -77,14 +112,14 @@ def load_log(last_n_hours):
         avg_humidity.append(round(entry['humidity'], 1))
         avg_vocs.append(round(entry['vocs'], 0))
         avg_co2.append(round(entry['co2'], 0))
-        if i == 1:
+        if i == 10:
             i = 0
             date_time_obj = datetime.strptime(entry['date'], "%d.%m.%Y %H:%M:%S")
             dates.append((date_time_obj - timedelta(hours=6)))
             temp.append(round(sum(avg_temp) / len(avg_temp), 1))
             humidity.append(round(sum(avg_humidity) / len(avg_humidity), 1))
-            vocs.append(round(sum(avg_vocs) / len(avg_vocs), 0))
-            co2.append(round(sum(avg_co2) / len(avg_co2), 0))
+            vocs.append(int(round(sum(avg_vocs) / len(avg_vocs), 0)))
+            co2.append(int(round(sum(avg_co2) / len(avg_co2), 0)))
             avg_temp = []
             avg_humidity = []
             avg_vocs = []
@@ -118,7 +153,8 @@ def load_log(last_n_hours):
 
 if __name__ == '__main__':
     args = sys.argv
-
+    args.append('-h')
+    args.append('1')
     h = None
     if len(args) > 1:
         if '-h' in args:
