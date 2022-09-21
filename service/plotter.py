@@ -106,32 +106,17 @@ def load_log(last_n_hours):
     humidity = []
     vocs = []
     co2 = []
-    avg_temp = []
-    avg_humidity = []
-    avg_vocs = []
-    avg_co2 = []
-    i = 0
     for entry in log:
-        avg_temp.append(round(entry['temp'], 1))
-        avg_humidity.append(round(entry['humidity'], 1))
-        avg_vocs.append(round(entry['vocs'], 0))
-        avg_co2.append(round(entry['co2'], 0))
-        if i == AVERAGE_COUNT:
-            i = 0
-            date_time_obj = datetime.strptime(entry['date'], "%d.%m.%Y %H:%M:%S")
-            dates.append((date_time_obj - timedelta(hours=6)))
-            temp.append(round(sum(avg_temp) / len(avg_temp), 1))
-            humidity.append(round(sum(avg_humidity) / len(avg_humidity), 1))
-            vocs.append(int(round(sum(avg_vocs) / len(avg_vocs), 0)))
-            co2.append(int(round(sum(avg_co2) / len(avg_co2), 0)))
-            avg_temp = []
-            avg_humidity = []
-            avg_vocs = []
-            avg_co2 = []
-        i += 1
+        date_time_obj = datetime.strptime(entry['date'], "%d.%m.%Y %H:%M:%S")
+        dates.append((date_time_obj - timedelta(hours=6)))
+        temp.append(entry['temp'])
+        humidity.append(entry['humidity'])
+        vocs.append(entry['vocs'])
+        co2.append(entry['co2'])
+
     if last_n_hours:
         last_date = dates[-1]
-
+        i = None
         for i in range(len(dates)-1, 0, -1):
             total_sec_diff = (last_date - dates[i]).total_seconds()
             hours_diff = divmod(total_sec_diff, 3600)[0]
@@ -151,7 +136,7 @@ def load_log(last_n_hours):
 if __name__ == '__main__':
     args = sys.argv
     args.append('-h')
-    args.append('1')
+    args.append('3')
     h = None
     if len(args) > 1:
         if '-h' in args:
