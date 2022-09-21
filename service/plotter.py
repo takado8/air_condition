@@ -26,7 +26,7 @@ def plot(args, last_n_hours):
                 return int(math.floor(math.log(number, 10)))
             delta_y = max_y - min_y
             step = delta_y / SCALE_Y_TICKS_NB
-            order = orderOfMagnitude(step)
+            order = orderOfMagnitude(step) if step > 0 else 1
             return round(step, -order)
 
         args.clear()
