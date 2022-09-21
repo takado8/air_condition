@@ -153,3 +153,4 @@ cython_debug/
 log/
 log\
 log.json
+log/log.json
