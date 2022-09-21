@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import matplotlib.dates as mdates
 import matplotlib.animation as anim
 import matplotlib.ticker as ticker
-from logger import Logger
+from service.logger import Logger
 import sys
 import math
 
@@ -55,8 +55,6 @@ def plot(args, last_n_hours):
                 txt = 'Temp: {} *C    Humidity: {} %'
             ax[i].set_title(txt.format(entry['y1'][-1], entry['y2'][-1]), fontsize=20)
             # ax[i].title.setsize(20)
-
-
             # twin object for two different y-axis on the sample plot
             twin = get_twin(ax[i])
             ax2 = ax[i].twinx() if twin is None else twin
@@ -145,13 +143,6 @@ def load_log(last_n_hours):
         co2 = co2[i:]
         temp = temp[i:]
         humidity = humidity[i:]
-    # print(log[-20:])
-    # print(dates[-20:])
-    # print(temp[-20:])
-    # print(humidity[-20:])
-    # exit(4)
-    # plot(x=dates, y1=temp, y2=humidity)
-    # plot(x=dates, y1=temp, y2=humidity, y1_label="Temperature *C", y2_label="Humidity[%]")
     return [{'x': dates, 'y1': vocs, 'y2': co2, 'y1_label': "VOCs [ppb]", 'y2_label': "CO2 [ppm]", 'x_label': 'Time'},
             {'x': dates, 'y1': temp, 'y2': humidity, 'y1_label': "Temp [*C]", 'y2_label': "Humidity [%]",
              'x_label': 'Time'}]
